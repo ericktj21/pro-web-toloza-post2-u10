@@ -1,0 +1,110 @@
+{
+  "info": {
+    "name": "API ToDoApp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "POST crear tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201 Created\", () => { pm.response.to.have.status(201); });",
+              "pm.test(\"Respuesta contiene id numerico\", () => { const b = pm.response.json(); pm.expect(b).to.have.property('id'); pm.collectionVariables.set('tareaId', b.id); });",
+              "pm.test(\"Tiempo de respuesta < 500ms\", () => { pm.expect(pm.response.responseTime).to.be.below(500); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\":\"Estudiar\",\"descripcion\":\"Demo\"}"
+        },
+        "url": "{{baseUrl}}/api/tareas"
+      }
+    },
+    {
+      "name": "GET obtener tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200 OK\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Titulo existe\", () => { const b = pm.response.json(); pm.expect(b).to.have.property('titulo'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/tareas/{{tareaId}}"
+      }
+    },
+    {
+      "name": "PATCH completar tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200 OK\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Completada en true\", () => { const b = pm.response.json(); pm.expect(b.completada).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "url": "{{baseUrl}}/api/tareas/{{tareaId}}/completar"
+      }
+    },
+    {
+      "name": "GET verificar completada",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200 OK\", () => { pm.response.to.have.status(200); });",
+              "pm.test(\"Completada en true\", () => { const b = pm.response.json(); pm.expect(b.completada).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/tareas/{{tareaId}}"
+      }
+    },
+    {
+      "name": "GET tarea inexistente (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", () => { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/tareas/999999"
+      }
+    }
+  ]
+}
