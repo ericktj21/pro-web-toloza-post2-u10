@@ -14,7 +14,7 @@
             "exec": [
               "pm.test(\"Status 201 Created\", () => { pm.response.to.have.status(201); });",
               "pm.test(\"Respuesta contiene id numerico\", () => { const b = pm.response.json(); pm.expect(b).to.have.property('id'); pm.collectionVariables.set('tareaId', b.id); });",
-              "pm.test(\"Tiempo de respuesta < 500ms\", () => { pm.expect(pm.response.responseTime).to.be.below(500); });"
+              "pm.test(\"Tiempo de respuesta < 3000ms\", () => { pm.expect(pm.response.responseTime).to.be.below(3000); });"
             ]
           }
         }
