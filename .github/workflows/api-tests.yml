@@ -11,12 +11,23 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17' # Usa la versión de Java de tu proyecto
+          java-version: '17'
 
-      - name: Iniciar Spring Boot
+      - name: Compilar aplicación (sin tests)
+        run: mvn -B -DskipTests package
+
+      - name: Iniciar aplicación (background)
         run: |
-          mvn spring-boot:run &
-          sleep 25 # Espera 25 segundos para que el servidor arranque por completo
+          java -jar target/*.jar &
+          # Esperar /actuator/health hasta 60s
+          for i in {1..12}; do
+            if curl -sSf http://localhost:8080/actuator/health >/dev/null; then
+              echo "App lista"
+              break
+            fi
+            echo "Esperando app... ($i)"
+            sleep 5
+          done
 
       - name: Instalar Node.js
         uses: actions/setup-node@v3
@@ -24,7 +35,9 @@ jobs:
           node-version: '18'
 
       - name: Instalar Newman
-        run: npm install -g newman
+        run: npm ci -g newman || npm install -g newman
 
       - name: Ejecutar pruebas de API con Newman
-        run: newman run postman/Tarea-API-Erick.json
+        run: |
+          ls -la postman || true
+          newman run postman/ColeccionToDo.json -e postman/env-ci.json --timeout-request 60000 --delay-request 200
